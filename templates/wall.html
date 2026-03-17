@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="google-site-verification" content="KIKELarkanePFBLzcF0aISNEhTd52riFsXhIN1-a11Y" />
-    <title>バイト収入シミュレーター｜時給・勤務時間から月収と年収を計算</title>
+    <title>年収の壁シミュレーター｜106万・123万・130万まであと何円・何時間か計算</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -104,9 +104,30 @@
             margin-top: 24px;
         }
 
+        .summary {
+            margin-bottom: 20px;
+        }
+
+        .summary-box {
+            background: #fffdf2;
+            border: 2px solid #f0d98a;
+            border-radius: 14px;
+            padding: 16px;
+        }
+
+        .summary-box h2 {
+            margin-top: 0;
+            font-size: 18px;
+        }
+
+        .annual {
+            font-size: 32px;
+            font-weight: bold;
+        }
+
         .card-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
             gap: 16px;
         }
 
@@ -118,31 +139,21 @@
         }
 
         .card h3 {
-            margin: 0 0 8px;
-            font-size: 16px;
-            color: #444;
+            margin: 0 0 12px;
+            font-size: 18px;
         }
 
-        .big {
-            font-size: 28px;
+        .status {
             font-weight: bold;
+            margin-bottom: 10px;
         }
 
-        .highlight-card {
-            background: #fffdf2;
-            border: 2px solid #f0d98a;
+        .ok {
+            color: #1f7a1f;
         }
 
-        .notice {
-            margin-top: 20px;
-            padding: 14px;
-            background: #fff8e1;
-            border: 1px solid #f0d98a;
-            border-radius: 12px;
-        }
-
-        .notice h3 {
-            margin-top: 0;
+        .ng {
+            color: #b00020;
         }
 
         ul {
@@ -162,17 +173,6 @@
             margin-top: 0;
         }
 
-        .tools-list ul {
-            margin-top: 10px;
-        }
-
-        .footer-note {
-            margin-top: 24px;
-            font-size: 14px;
-            color: #666;
-            line-height: 1.7;
-        }
-
         .text-section {
             margin-top: 28px;
             line-height: 1.8;
@@ -181,6 +181,13 @@
 
         .text-section p {
             margin-bottom: 14px;
+        }
+
+        .footer-note {
+            margin-top: 24px;
+            font-size: 14px;
+            color: #666;
+            line-height: 1.7;
         }
     </style>
 </head>
@@ -191,10 +198,11 @@
             <a href="/wall">年収の壁シミュレーター</a>
         </div>
 
-        <h1>学生向けバイト収入シミュレーター</h1>
+        <h1>年収の壁シミュレーター</h1>
         <p class="sub">
-            時給・シフトから月収 / 年収を計算し、年収の壁の目安も確認できます。<br>
-            1か月の勤務週数は平均値として <strong>{{ weeks_per_month }}</strong> 週で自動計算しています。
+            時給・勤務時間・週の勤務日数から年収を計算し、106万円・123万円・130万円の壁まで
+            あと何円・何時間・何日働けるかの目安を確認できます。<br>
+            月の勤務週数は平均 <strong>{{ weeks_per_month }}</strong> 週で計算しています。
         </p>
 
         {% if errors %}
@@ -218,7 +226,7 @@
             <div class="field">
                 <label for="hours_per_day">1日の勤務時間</label>
                 <input type="number" id="hours_per_day" name="hours_per_day" step="0.5" min="0.5" value="{{ form_data.hours_per_day }}" required>
-                <div class="hint">0.5時間刻みで入力してください（例: 4, 4.5, 5）</div>
+                <div class="hint">0.5時間刻みで入力してください</div>
             </div>
 
             <div class="field">
@@ -227,58 +235,38 @@
                 <div class="hint">整数で入力してください</div>
             </div>
 
-            <div class="field">
-                <label for="target_monthly_income">目標月収（円）</label>
-                <input type="number" id="target_monthly_income" name="target_monthly_income" step="1" min="1" value="{{ form_data.target_monthly_income }}" required>
-                <div class="hint">整数で入力してください</div>
-            </div>
-
             <button type="submit">計算する</button>
         </form>
 
         {% if result %}
         <div class="results">
-            <div class="card-grid">
-                <div class="card">
-                    <h3>日収</h3>
-                    <div class="big">{{ "{:,}".format(result.daily_income) }}円</div>
-                </div>
-
-                <div class="card">
-                    <h3>週収</h3>
-                    <div class="big">{{ "{:,}".format(result.weekly_income) }}円</div>
-                </div>
-
-                <div class="card highlight-card">
-                    <h3>月収</h3>
-                    <div class="big">{{ "{:,}".format(result.monthly_income) }}円</div>
-                </div>
-
-                <div class="card">
-                    <h3>年収</h3>
-                    <div class="big">{{ "{:,}".format(result.annual_income) }}円</div>
-                </div>
-
-                <div class="card">
-                    <h3>目標月収までの必要勤務日数</h3>
-                    <div class="big">{{ result.required_days_for_target }}日</div>
-                </div>
-
-                <div class="card">
-                    <h3>目標月収までの必要労働時間</h3>
-                    <div class="big">{{ result.required_hours_for_target }}時間</div>
+            <div class="summary">
+                <div class="summary-box">
+                    <h2>現在の年収目安</h2>
+                    <div class="annual">{{ "{:,}".format(result.annual_income) }}円</div>
                 </div>
             </div>
 
-            <div class="notice">
-                <h3>年収の壁の目安</h3>
-                <p>働きすぎ防止の目安として参考にしてください。</p>
-                <p>{{ result.wall_message }}</p>
-                <ul>
-                    {% for item in result.wall_status %}
-                    <li><strong>{{ item.name }}</strong>：{{ item.status }}</li>
-                    {% endfor %}
-                </ul>
+            <div class="card-grid">
+                {% for item in result.wall_results %}
+                <div class="card">
+                    <h3>{{ item.name }}の壁</h3>
+                    <div class="status {% if item.status == '未到達' %}ok{% else %}ng{% endif %}">
+                        {{ item.status }}
+                    </div>
+                    <ul>
+                        {% if item.status == '未到達' %}
+                        <li>あと {{ "{:,}".format(item.remaining_yen) }}円</li>
+                        <li>あと {{ item.remaining_hours }} 時間</li>
+                        <li>あと {{ item.remaining_days }} 日</li>
+                        {% else %}
+                        <li>{{ "{:,}".format(item.remaining_yen) }}円 超過</li>
+                        <li>{{ item.remaining_hours }} 時間分 超過</li>
+                        <li>{{ item.remaining_days }} 日分 超過</li>
+                        {% endif %}
+                    </ul>
+                </div>
+                {% endfor %}
             </div>
         </div>
         {% endif %}
@@ -292,18 +280,17 @@
         </div>
 
         <div class="text-section">
-            <h2>バイト収入シミュレーターの使い方</h2>
+            <h2>年収の壁シミュレーターの使い方</h2>
             <p>
-                このツールでは、時給・1日の勤務時間・週の勤務日数から
-                バイト収入の目安（日収・月収・年収）を計算できます。
-                学生のアルバイトや副業の収入計算の参考として使えます。
+                このツールでは、時給・1日の勤務時間・週の勤務日数から年収の目安を計算し、
+                106万円・123万円・130万円の壁まであと何円、何時間、何日働けるかを確認できます。
+                学生アルバイトの働き方を考えるときの参考に使えます。
             </p>
 
-            <h2>バイト収入計算の目安</h2>
+            <h2>年収の壁の目安について</h2>
             <p>
-                月の勤務週数は平均4.3週として計算しています。
-                実際の収入はシフトや勤務日数によって変わるため、
-                目安として参考にしてください。
+                実際の税金・社会保険・扶養判定は、年齢、勤務先、他の所得、加入条件などで変わります。
+                このページの結果はあくまで概算の目安であり、最終的には勤務先や公的機関の案内を確認してください。
             </p>
         </div>
 
