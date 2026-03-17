@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>学生向けバイト収入シミュレーター</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 920px;
+            margin: 0 auto;
+            padding: 24px;
+            background: #f7f7f7;
+            color: #222;
+        }
+
+        .container {
+            background: #fff;
+            padding: 24px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+
+        h1 {
+            margin-top: 0;
+            font-size: 28px;
+            line-height: 1.4;
+        }
+
+        .sub {
+            color: #555;
+            margin-bottom: 24px;
+            line-height: 1.6;
+        }
+
+        form {
+            display: grid;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        label {
+            font-weight: bold;
+        }
+
+        input {
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            font-size: 16px;
+        }
+
+        .hint {
+            font-size: 13px;
+            color: #666;
+        }
+
+        button {
+            padding: 14px 16px;
+            border: none;
+            border-radius: 10px;
+            background: #222;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .error-box {
+            margin-bottom: 20px;
+            padding: 14px 16px;
+            background: #ffe9e9;
+            border: 1px solid #e3a8a8;
+            border-radius: 12px;
+            color: #8a1f1f;
+        }
+
+        .results {
+            margin-top: 24px;
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+        }
+
+        .card {
+            background: #fafafa;
+            border: 1px solid #e6e6e6;
+            border-radius: 14px;
+            padding: 16px;
+        }
+
+        .card h3 {
+            margin: 0 0 8px;
+            font-size: 16px;
+            color: #444;
+        }
+
+        .big {
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .notice {
+            margin-top: 20px;
+            padding: 14px;
+            background: #fff8e1;
+            border: 1px solid #f0d98a;
+            border-radius: 12px;
+        }
+
+        .notice h3 {
+            margin-top: 0;
+        }
+
+        ul {
+            padding-left: 20px;
+            margin-bottom: 0;
+        }
+
+        .footer-note {
+            margin-top: 24px;
+            font-size: 14px;
+            color: #666;
+            line-height: 1.7;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>学生向けバイト収入シミュレーター</h1>
+        <p class="sub">
+            時給・シフトから月収 / 年収を計算し、年収の壁の目安も確認できます。<br>
+            1か月の勤務週数は平均値として <strong>{{ weeks_per_month }}</strong> 週で自動計算しています。
+        </p>
+
+        {% if errors %}
+        <div class="error-box">
+            <strong>入力内容を確認してください。</strong>
+            <ul>
+                {% for error in errors %}
+                <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
+        <form method="POST">
+            <div class="field">
+                <label for="hourly_wage">時給（円）</label>
+                <input type="number" id="hourly_wage" name="hourly_wage" step="1" min="1" value="{{ form_data.hourly_wage }}" required>
+                <div class="hint">整数で入力してください</div>
+            </div>
+
+            <div class="field">
+                <label for="hours_per_day">1日の勤務時間</label>
+                <input type="number" id="hours_per_day" name="hours_per_day" step="0.5" min="0.5" value="{{ form_data.hours_per_day }}" required>
+                <div class="hint">0.5時間刻みで入力してください（例: 4, 4.5, 5）</div>
+            </div>
+
+            <div class="field">
+                <label for="days_per_week">週の勤務日数</label>
+                <input type="number" id="days_per_week" name="days_per_week" step="1" min="1" value="{{ form_data.days_per_week }}" required>
+                <div class="hint">整数で入力してください</div>
+            </div>
+
+            <div class="field">
+                <label for="target_monthly_income">目標月収（円）</label>
+                <input type="number" id="target_monthly_income" name="target_monthly_income" step="1" min="1" value="{{ form_data.target_monthly_income }}" required>
+                <div class="hint">整数で入力してください</div>
+            </div>
+
+            <button type="submit">計算する</button>
+        </form>
+
+        {% if result %}
+        <div class="results">
+            <div class="card-grid">
+                <div class="card">
+                    <h3>日収</h3>
+                    <div class="big">{{ "{:,}".format(result.daily_income) }}円</div>
+                </div>
+
+                <div class="card">
+                    <h3>週収</h3>
+                    <div class="big">{{ "{:,}".format(result.weekly_income) }}円</div>
+                </div>
+
+                <div class="card">
+                    <h3>月収</h3>
+                    <div class="big">{{ "{:,}".format(result.monthly_income) }}円</div>
+                </div>
+
+                <div class="card">
+                    <h3>年収</h3>
+                    <div class="big">{{ "{:,}".format(result.annual_income) }}円</div>
+                </div>
+
+                <div class="card">
+                    <h3>目標月収までの必要勤務日数</h3>
+                    <div class="big">{{ result.required_days_for_target }}日</div>
+                </div>
+
+                <div class="card">
+                    <h3>目標月収までの必要労働時間</h3>
+                    <div class="big">{{ result.required_hours_for_target }}時間</div>
+                </div>
+            </div>
+
+            <div class="notice">
+                <h3>年収の壁の目安</h3>
+                <p>{{ result.wall_message }}</p>
+                <ul>
+                    {% for item in result.wall_status %}
+                    <li><strong>{{ item.name }}</strong>：{{ item.status }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        {% endif %}
+
+        <p class="footer-note">
+            このツールは概算シミュレーターです。税金・社会保険・扶養判定は、
+            年齢、学校区分、勤務先、他の所得、加入条件などで変わるため、
+            最終確認は勤務先や公的機関の案内で行ってください。
+        </p>
+    </div>
+</body>
+</html>
