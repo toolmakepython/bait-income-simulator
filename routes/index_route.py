@@ -59,6 +59,7 @@ def index():
             required_days_for_target, required_hours_for_target = calculate_target(
                 monthly_target=target_monthly_income,
                 daily_income=income_result["daily_income"],
+                hourly_wage=hourly_wage,
             )
 
             wall_status = calculate_wall_status(income_result["annual_income"])

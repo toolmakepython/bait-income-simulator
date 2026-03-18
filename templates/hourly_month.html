@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block title %}時給から月収・年収を計算｜時給→月収計算ツール{% endblock %}
+{% block meta_description %}時給・1日の勤務時間・月の勤務日数を入力するだけで、日収・月収・年収の目安を簡単に計算できる無料ツールです。{% endblock %}
+
+{% block content %}
+<section class="tool-container">
+    <h1>時給から月収・年収を計算</h1>
+    <p class="lead">
+        時給・1日の勤務時間・月の勤務日数を入れるだけで、日収・月収・年収の目安を計算できます。
+    </p>
+
+    {% if errors %}
+        <div class="error-box">
+            <ul>
+                {% for error in errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
+    <form method="post" class="tool-form">
+        <div class="form-group">
+            <label for="hourly_wage">時給（円）</label>
+            <input
+                type="number"
+                id="hourly_wage"
+                name="hourly_wage"
+                value="{{ form_data.hourly_wage }}"
+                min="1"
+                step="1"
+                required
+            >
+        </div>
+
+        <div class="form-group">
+            <label for="hours_per_day">1日の勤務時間</label>
+            <input
+                type="number"
+                id="hours_per_day"
+                name="hours_per_day"
+                value="{{ form_data.hours_per_day }}"
+                min="0.5"
+                step="0.5"
+                required
+            >
+        </div>
+
+        <div class="form-group">
+            <label for="days_per_month">月の勤務日数</label>
+            <input
+                type="number"
+                id="days_per_month"
+                name="days_per_month"
+                value="{{ form_data.days_per_month }}"
+                min="1"
+                step="1"
+                required
+            >
+        </div>
+
+        <button type="submit">計算する</button>
+    </form>
+
+    {% if result %}
+        <section class="result-box">
+            <h2>計算結果</h2>
+            <ul>
+                <li>日収：{{ "{:,}".format(result.daily_income) }}円</li>
+                <li>月収：{{ "{:,}".format(result.monthly_income) }}円</li>
+                <li>年収：{{ "{:,}".format(result.annual_income) }}円</li>
+            </ul>
+        </section>
+    {% endif %}
+
+    <section class="tool-description">
+        <h2>このツールでできること</h2>
+        <p>
+            アルバイトやパートの時給から、1か月あたりどれくらい稼げるかをすぐに確認できます。
+            シフトを増やした場合の月収目安や、年収の概算チェックにも使えます。
+        </p>
+    </section>
+</section>
+{% endblock %}

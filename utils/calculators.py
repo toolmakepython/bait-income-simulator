@@ -119,3 +119,15 @@ def calculate_wall_info(hourly_wage, hours_per_day, days_per_week):
         "annual_income": income_result["annual_income"],
         "wall_results": wall_results,
     }
+
+
+def calculate_hourly_month_income(hourly_wage, hours_per_day, days_per_month):
+    daily_income = hourly_wage * hours_per_day
+    monthly_income = daily_income * days_per_month
+    annual_income = monthly_income * 12
+
+    return {
+        "daily_income": int(daily_income),
+        "monthly_income": int(monthly_income),
+        "annual_income": int(annual_income),
+    }

@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}年収から月収を計算｜年収→月収計算ツール{% endblock %}
+{% block meta_description %}年収を入力するだけで月収の目安を計算できる無料ツールです。転職時の給与比較や収入イメージの確認に使えます。{% endblock %}
+
+{% block content %}
+<section class="tool-container">
+
+<h1>年収から月収を計算</h1>
+
+<p class="sub">
+年収を入力すると、1か月あたりの月収目安を計算できます。
+</p>
+
+{% if errors %}
+<div class="error-box">
+<ul>
+{% for error in errors %}
+<li>{{ error }}</li>
+{% endfor %}
+</ul>
+</div>
+{% endif %}
+
+<form method="post">
+
+<div class="field">
+<label>年収（円）</label>
+<input
+type="number"
+name="annual_income"
+value="{{ form_data.annual_income }}"
+min="1"
+required
+>
+</div>
+
+<button type="submit">計算する</button>
+
+</form>
+
+{% if result %}
+<section class="results">
+
+<h2>計算結果</h2>
+
+<div class="card-grid">
+
+<div class="card highlight-card">
+<h3>月収</h3>
+<div class="big">
+{{ "{:,}".format(result.monthly_income) }}円
+</div>
+</div>
+
+</div>
+
+</section>
+{% endif %}
+
+<section class="text-section">
+
+<h2>このツールでできること</h2>
+
+<p>
+年収から1か月あたりの月収の目安を簡単に計算できます。
+</p>
+
+<p>
+転職時の給与比較や、年収ベースの収入イメージ確認などに使えます。
+</p>
+
+</section>
+
+</section>
+{% endblock %}
